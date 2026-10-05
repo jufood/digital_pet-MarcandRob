@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 
+import 'pet_personality.dart';
+import 'pet_name_input.dart';
+import 'animated_meter.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -11,7 +15,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Digital Pet',
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -30,7 +34,7 @@ class MyApp extends StatelessWidget {
         // tested with just a hot reload.
         colorScheme: .fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MyHomePage(title: 'Digital Pet'),
     );
   }
 }
@@ -54,17 +58,43 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  String _petName = 'Pip';
+  int _happiness = 50;
+  int _hunger = 50;
 
-  void _incrementCounter() {
+  final TextEditingController _nameController =
+    TextEditingController(text: 'Pip');
+
+  void _confirmName() {
+    final newName = _nameController.text.trim();
+
+    if (newName.isEmpty) {
+      return;
+    }
+
     setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
+      _petName = newName;
     });
+  }
+
+  void _testFeed() {
+    setState(() {
+      _hunger = (_hunger - 10).clamp(0, 100);
+      _happiness = (_happiness + 5).clamp(0, 100);
+    });
+  }
+
+  void _testPlay() {
+    setState(() {
+      _happiness = (_happiness + 15).clamp(0, 100);
+      _hunger = (_hunger + 5).clamp(0, 100);
+    });
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    super.dispose();
   }
 
   @override
@@ -85,37 +115,60 @@ class _MyHomePageState extends State<MyHomePage> {
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: .center,
-          children: [
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
+
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            children: [
+              PetPersonality(
+                petName: _petName,
+                happiness: _happiness,
+                hunger: _hunger,
+              ),
+
+              const SizedBox(height: 30),
+
+              PetNameInput(
+                controller: _nameController,
+                onConfirm: _confirmName,
+              ),
+
+              const SizedBox(height: 30),
+
+              AnimatedMeter(
+                label: 'Happiness',
+                value: _happiness,
+              ),
+
+              const SizedBox(height: 24),
+
+              AnimatedMeter(
+                label: 'Hunger',
+                value: _hunger,
+              ),
+
+              const SizedBox(height: 30),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                    onPressed: _testFeed,
+                    child: const Text('Feed'),
+                  ),
+
+                  const SizedBox(width: 16),
+
+                  ElevatedButton(
+                    onPressed: _testPlay,
+                    child: const Text('Play'),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
       ),
     );
   }

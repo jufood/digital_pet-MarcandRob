@@ -71,10 +71,11 @@ class PetPersonality extends StatelessWidget {
               moodColor,
               BlendMode.modulate,
             ),
-            child: const Icon(
-              Icons.pets,
-              size: 140,
-              color: Colors.white,
+            child: Image.asset(
+              'assets/pet.png',
+              width: 160,
+              height: 160,
+              fit: BoxFit.contain,
             ),
           ),
         ),
